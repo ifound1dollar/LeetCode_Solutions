@@ -11,7 +11,7 @@ namespace LeetCode_Template
             
             //here are this problem's variables
             int returnItem;
-            int[] argumentItem = new int[] { 2, 3, 6, 18 };
+            int[] argumentItem = new int[] { 2, 4, 5, 10 };
 
             //method call
             returnItem = NumFactoredBinaryTrees(argumentItem);
@@ -22,38 +22,56 @@ namespace LeetCode_Template
 
         static int NumFactoredBinaryTrees(int[] arr)
         {
-            ///#823, 08/09/2022 (look-up)
+            ///#823 Binary Trees With Factors, 08/09/2022
 
             //sort array and declare longs for number found and modulo value
             Array.Sort(arr);
             long numFound = 0;
             long mod = (long)(Math.Pow(10, 9) + 7);
 
-            //declare dictionary to store number of factors of each int in array, then iterate
-            Dictionary<int, long> factors = new();
+            //create array corresponding to arr that will store number of factors for each item in arr
+            long[] factors = new long[arr.Length];
+
+            //iterate through every item in arr
             for (int i = 0; i < arr.Length; i++)
             {
-                //always includes itself right away
-                factors[arr[i]] = 1;
+                //immediately set factor to 1, because each should count itself once right away
+                factors[i] = 1;
 
-                //iterate from beginning up to index i
+                //iterate from start but stopping before reaching i (current largest item)
                 for (int j = 0; j < i; j++)
                 {
-                    //if the item at index i is divisible by the item at index j
+                    //IF the larger item (i) is divisible by the smaller item (j)
                     if (arr[i] % arr[j] == 0)
                     {
-                        //Set value at index i dictionary key to its existing value (originally 1) PLUS
-                        //  the value at index j TIMES the value that MAY EXIST when i and j's values
-                        //  are divided (if not, defaults to 0 and only adds 1 to factors[arr[i]]).
-                        //This operation should simulate adding all subtrees to a parent tree.
-                        //Modulo operation is used in case of int32 overflow.
-                        factors[arr[i]] = (factors[arr[i]]
-                            + (factors[arr[j]] * factors.GetValueOrDefault(arr[i] / arr[j]))) % mod;
+                        //check if the target value (arr[i]/arr[j]) exists in arr using BinarySearch
+                        int index = Array.BinarySearch(arr, arr[i] / arr[j]);
+
+                        //if index is non-negative, it exists and BinarySearch returned a valid index
+                        if (index >= 0)
+                        {
+                            ///EXPLANATION
+                            ///Multiply the FACTOR VALUES of the smaller item (j) and this item (index)
+                            /// and add to factors[i]. This simulates including subtrees of a parent
+                            /// tree.
+                            ///EXAMPLE: [ 2, 3, 6, 18] would result in 6 having three potential
+                            /// representations of itself: [6], [2,3], and [3,2]. Each different
+                            /// representation must be added to the total factors of 18 when it is
+                            /// the item at index i. 18's factor would be set to 1 immediately, then
+                            /// its factors of [3,6] and [6,3] would multiply the factors of 3(1)
+                            /// and 6(3) both times to ensure every case is included (total 7 for 18).
+                            ///The addition operation uses the mod operator before assignment to
+                            /// prevent int32 overflow problems.
+                            ///After the assignment, break from the loop because there can only be
+                            /// ONE other item to complete the potential binary tree.
+
+                            factors[i] += (factors[j] * factors[index]) % mod;
+                        }
                     }
                 }
 
-                //after each i iteration, add value at dictionary key to numFound (and prevent int32 overflow)
-                numFound = (numFound + factors[arr[i]]) % mod;
+                //after adding each potential binary tree to factors, add to numFound (and prevent int32 overflow)
+                numFound = (numFound + factors[i]) % mod;
             }
 
             //finally, cast numFound to int and return
