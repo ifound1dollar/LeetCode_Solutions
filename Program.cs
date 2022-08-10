@@ -3,6 +3,18 @@ using System.Collections.Generic;
 
 namespace LeetCode_Template
 {
+    public class TreeNode
+    {
+        public int val;
+        public TreeNode left;
+        public TreeNode right;
+        public TreeNode(int val = 0, TreeNode left = null, TreeNode right = null)
+        {
+            this.val = val;
+            this.left = left;
+            this.right = right;
+        }
+    }
     class Program
     {
         static void Main()
@@ -10,20 +22,77 @@ namespace LeetCode_Template
             ///Main method makes a call to this problem's dedicated method, then prints the value and exits.
             
             //here are this problem's variables
-            int returnItem;
-            int[] argumentItem = new int[] { 2, 4, 5, 10 };
+            TreeNode returnItem;
+            int[] argumentItem = new int[] { -10, -3, 0, 5, 9 };
 
             //method call
-            returnItem = NumFactoredBinaryTrees(argumentItem);
+            returnItem = SortedArrayToBST(argumentItem);
 
             //print value
             Console.WriteLine("RETURN ITEM: " + returnItem);
         }
 
+
+        ///#108 Convert Sorted Array to Binary Search Tree, 08/10/2022
+        static TreeNode SortedArrayToBST(int[] nums)
+        {
+            //empty array check
+            if (nums.Length == 0)
+            {
+                return null;
+            }
+
+            //creates the head object, CreateNode will handle all left and right TreeNodes in tree
+            TreeNode head = CreateNode(nums, 0, nums.Length - 1);
+
+            return head;
+        }
+        static TreeNode CreateNode(int[] nums, int min, int max)
+        {
+            //if min is now more than max, every item in array is now part of tree, so return null
+            if (min > max)
+            {
+                return null;
+            }
+
+            //set to midpoint of min and max (integer division, so floor operation)
+            int mid = (min + max) / 2;
+
+            //create new TreeNode with val of array at mid index
+            TreeNode treeNode = new(val: nums[mid])
+            {
+                ///EXPLANATION
+                ///Recursively call CreateNode for left (less than mid) and right (more than
+                /// mid) TreeNodes. The array is passed without change; if using the left side
+                /// of the array, the minimum value should be passed with this mid value (MINUS
+                /// 1 AS TO EXCLUDE ITSELF) as the maximum. OTHERWISE, if using the right side,
+                /// the minimum value should be this mid value (AGAIN, EXCLUDING ITSELF).
+                ///Because the call is recursive, each new TreeNode only knows the max and min
+                /// values from the previously calling method.
+                /// 
+                ///EXAMPLE: [ -10, -3, 0, 5, 9 ]
+                /// The head object calls CreateNode to assign val = 0 (mid item), where min
+                /// and max are the actual beginning and end of the array. When CreateNode is
+                /// called for the left TreeNode, it only uses indices 0 and 1 (excluding
+                /// itself, 2) as the min and max. The right side only uses 3 and 4. Each of
+                /// these will perform the same operation (mid always uses floor operation,
+                /// remember) until min is greater than max (min becomes greater than max
+                /// because mid is always excluded, resulting in a +1 or -1 operation).
+                ///The end of this recursive process will ensure that every item in the array
+                /// is assigned as a left or right TreeNode; the absolute bottom TreeNodes
+                /// will have left and right both be null.
+
+                left = CreateNode(nums, min, mid - 1),
+                right = CreateNode(nums, mid + 1, max)
+            };
+
+            return treeNode;
+        }
+
+
+        ///#823 Binary Trees With Factors, 08/09/2022
         static int NumFactoredBinaryTrees(int[] arr)
         {
-            ///#823 Binary Trees With Factors, 08/09/2022
-
             //sort array and declare longs for number found and modulo value
             Array.Sort(arr);
             long numFound = 0;
@@ -78,10 +147,10 @@ namespace LeetCode_Template
             return (int)numFound;
         }
 
+
+        ///#704, 08/09/2022
         static int BinarySearchTargetIndex(int[] nums, int target)
         {
-            ///#704, 08/09/2022
-
             //variables for indices of minimum, maximum
             int min = 0;
             int max = nums.Length - 1;
@@ -112,10 +181,11 @@ namespace LeetCode_Template
             //only reaches here if target is not in array, which then should return -1
             return -1;
         }
+
+
+        ///#300, 08/08/2022
         static int LongestIncreasingSubsequence(int[] nums)
         {
-            ///#300, 08/08/2022
-            
             //create List and add first item of array, then iterate through array
             List<int> subList = new() { nums[0] };
             for (int i = 1; i < nums.Length; i++)
