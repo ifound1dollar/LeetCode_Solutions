@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace LeetCode_Template
 {
@@ -22,14 +23,134 @@ namespace LeetCode_Template
             ///Main method makes a call to this problem's dedicated method, then prints the value and exits.
             
             //here are this problem's variables
-            TreeNode returnItem;
-            int[] argumentItem = new int[] { -10, -3, 0, 5, 9 };
+            IList<IList<int>> returnItem;
+            int[] argumentItem = new int[] { 2, 3, 6, 7 };
+            int argumentTarget = 7;
 
             //method call
-            returnItem = SortedArrayToBST(argumentItem);
+            returnItem = CombinationSum(argumentItem, argumentTarget);
 
             //print value
             Console.WriteLine("RETURN ITEM: " + returnItem);
+            foreach (IList<int> list in returnItem)
+            {
+                foreach (int item in list)
+                {
+                    Console.Write(item + " ");
+                }
+                Console.WriteLine("");
+            }
+        }
+
+
+        ///#39 Combination Sum, 08/17/2022
+        static IList<IList<int>> CombinationSum(int[] candidates, int target)
+        {
+            ///this will find every possible combination of any size that when summed will equal 'target'
+
+            //instantiate ilist of ilists for entire result and temporary list to be added after recursion
+            IList<IList<int>> result = new List<IList<int>>();
+            List<int> temp = new();
+            //use integer instead of List.Sum() for efficiency
+            int tempSum = 0;
+
+            //start of recursive call that assigns all valid values to 'result'
+            FindCombinationSum(result, temp, tempSum, start: 0, candidates, target);
+
+            //after recursive operations, return result
+            return result;
+        }
+        static void FindCombinationSum(IList<IList<int>> result, List<int> temp, int tempSum,
+            int start, int[] candidates, int target)
+        {
+            ///this recursive method will add the value at this step, then check if the sum is
+            /// too high, correct, or less than the target, and do actions accordingly
+
+            //if higher than target, return now since this value can't be valid for this recursive step
+            if (tempSum > target)
+            {
+                return;
+            }
+            //else if same as target, then a valid list has been found that sums to target
+            else if (tempSum == target)
+            {
+                //add NEW OBJECT with 'temp' values to the 'result' object, then return
+                result.Add(new List<int>(temp));
+                return;
+            }
+            ///IMPLICIT ELSE AFTER RETURN STATEMENTS
+
+            //IF LESS THAN TARGET, iterate through the remainder, starting from 0
+            //NOTE: starting from 0 will prevent some later operations that would be completely
+            //  unnecessary (starting from highest can try to add a very small number multiple
+            //  times, but starting from the smallest may instead just add one larger number once)
+            for (int i = start; i < candidates.Length; i++)
+            {
+                //add this item to 'temp' (will be removed below after recursive call)
+                temp.Add(candidates[i]);
+                tempSum += candidates[i];
+
+                //after adding item, recursively call this method (using same value for i allows the
+                //  same number to be added more than once UNTIL 'temp' becomes higher than target,
+                //  which then causes the recursion to return)
+                FindCombinationSum(result, temp, tempSum, i, candidates, target);
+
+                //when recursion returns, will move on to the next lowest value and try again AFTER
+                //  removing the recently added value to 'temp' (the item at this index will have been
+                //  exhausted and can not possibly have any more combinations; was either greater than
+                //  or equal to target value)
+                temp.RemoveAt(temp.Count - 1);
+                tempSum -= candidates[i];
+            }
+        }
+
+
+
+        ///#77 Combinations, 08/17/2022
+        static IList<IList<int>> Combine(int n, int k)
+        {
+            ///this method finds all combinations of length k in a list from 1 to n; [ 1, 2, 3, 4 ] if n = 4
+            
+            //instantiate ilist of ilists for entire result and temporary list to be added after recursion
+            IList<IList<int>> result = new List<IList<int>>();
+            List<int> temp = new();
+
+            //start of recursive calls to this method, where 1 is the starting value (1 to n)
+            FindCombinationsFromStartIndex(result, temp, 1, n, k);
+
+            //after recursive operations, return object
+            return result;
+        }
+        static void FindCombinationsFromStartIndex(IList<IList<int>> result, List<int> temp, int start, int n, int k)
+        {
+            ///temp stores current list until complete; k will denote how many remaining characters are needed
+            /// for complete temp List; once 0, add the list to 'result' and return
+            
+            //if k is 0, no more items need to be added to 'temp'
+            if (k == 0)
+            {
+                //add temp as NEW OBJECT, as to not reference the same object each time, then return
+                result.Add(new List<int>(temp));
+                return;
+            }
+
+            //loop through all items AFTER 'start' and UP TO the maximum number of remaining characters
+            //  that can be added (if k = 2, then 2 characters remain and thus the last character CANNOT
+            //  possibly be the second item in 'temp' List)
+            for (int i = start; i <= n - k + 1; i++)
+            {
+                //add this index, because it is a valid part of 'temp' list (ex. with k of 3, i = 1 can
+                //  count as the first item, as could the second as long as i <= n - k + 1)
+                temp.Add(i);
+
+                //RECURSIVE CALL, using i + 1 because must start at next item and using k + 1 because
+                //  there is 1 less character that must be added to 'temp' (if k = 0, will return when
+                //  reaching if statement above, and for loop will continue for as long as necessary)
+                FindCombinationsFromStartIndex(result, temp, i + 1, n, k - 1);
+
+                //after recursive call, this specific item (i) must be removed to make room for the next
+                temp.RemoveAt(temp.Count - 1);
+            }
         }
 
 
