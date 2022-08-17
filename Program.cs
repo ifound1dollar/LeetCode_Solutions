@@ -23,24 +23,140 @@ namespace LeetCode_Template
             ///Main method makes a call to this problem's dedicated method, then prints the value and exits.
             
             //here are this problem's variables
-            IList<IList<int>> returnItem;
-            int[] argumentItem = new int[] { 2, 3, 6, 7 };
-            int argumentTarget = 7;
+            bool returnItem;
+            char[][] argumentItem = new char[][]
+            { 
+                new char[] { 'a', 'a', 'a', 'a' },
+                new char[] { 'a', 'b', 'b', 'a' },
+                new char[] { 'a', 'b', 'b', 'a' },
+                new char[] { 'a', 'a', 'a', 'a' },
+            };
 
             //method call
-            returnItem = CombinationSum(argumentItem, argumentTarget);
+            returnItem = ContainsCycle(argumentItem);
 
             //print value
             Console.WriteLine("RETURN ITEM: " + returnItem);
-            foreach (IList<int> list in returnItem)
-            {
-                foreach (int item in list)
-                {
-                    Console.Write(item + " ");
-                }
-                Console.WriteLine("");
-            }
         }
+
+
+
+        /// #1559 Detect Cycles in 2D Grid, 08/17/2022
+        static readonly int[] X_CHANGE = { 1, -1, 0, 0 };
+        static readonly int[] Y_CHANGE = { 0, 0, 1, -1 };
+        static bool ContainsCycle(char[][] grid)
+        {
+            //populate 2d array of bools to determine which node has been visited yet
+            bool[][] visited = new bool[grid.Length][];
+            for (int i = 0; i < visited.Length; i++)
+            {
+                visited[i] = new bool[grid[i].Length];
+            }
+
+            //iterate through every item in 2d array, using i and j
+            for (int i = 0; i < grid.Length; i++)
+            {
+                for (int j = 0; j < grid[0].Length; j++)
+                {
+                    //only call method if the current point has not yet been visited, because any
+                    //  point that is potentially a cycle is interconnected to all others of the
+                    //  same startChar
+                    if (!visited[i][j])
+                    {
+                        //each recursive return will be either true or false, only setting to true
+                        //  if a cycle was found, so only return true if true was returned from method
+                        if (ContainsCycleDFS(grid, visited, -1, -1, i, j))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            //will return true above if/when a cycle is found, so if reaches this point, no cycle was found
+            return false;
+        }
+        static bool ContainsCycleDFS(char[][] grid, bool[][] visited,
+            int preX, int preY, int curX, int curY)
+        {
+            //declare bool for whether a cycle was found and set this node to visited
+            visited[curX][curY] = true;
+
+            //iterate through all four adjacent nodes, validity checked inside loop
+            for (int i = 0; i < 4; i++)
+            {
+                //use arrays from above to alter X and Y accordingly (x changes in 0, 1 and y changes in 2, 3)
+                int newX = curX + X_CHANGE[i];
+                int newY = curY + Y_CHANGE[i];
+
+                //check for validity of point, non-negative and not more than bounds of grid
+                if ((newX >= 0 && newX < grid.Length) && (newY >= 0 && newY < grid[0].Length))
+                {
+                    //don't visit previous point (as long as AT LEAST ONE is different, is valid)
+                    if (newX != preX || newY != preY)
+                    {
+                        //only if the char at the new point is the same as the original
+                        if (grid[newX][newY] == grid[curX][curY])
+                        {
+                            //if the new point has been visited after all previous checks, return true
+                            //if the recursive call (using curX/Y as preX/Y AND newX/Y as curX/Y) returns
+                            //  true, return true further up the chain
+                            if (visited[newX][newY] || ContainsCycleDFS(grid, visited, curX, curY, newX, newY))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            //will always return true BEFORE here if a cycle is found, so return false
+            return false;
+        }
+
+
+
+        ///#804 Unique Morse Code Words, 08/17/2022
+        static int UniqueMorseRepresentations(string[] words)
+        {
+            //instantiate string[] of morse code transformations for each character from a - z
+            string[] morseValues = new string[]
+            {
+                //13 per line, first: a - n, second: o - z
+                ".-", "-...", "-.-.", "-..", ".", "..-.", "--.", "....", "..", ".---", "-.-", ".-..", "--",
+                "-.", "---", ".--.", "--.-", ".-.", "...", "-", "..-", "...-", ".--", "-..-", "-.--", "--.."
+            };
+
+            //create LinkedList to hold every unique transformation
+            LinkedList<string> result = new();
+
+            //iterate through each word
+            foreach (string word in words)
+            {
+                //declare empty string for transformation
+                string transformation = "";
+
+                //iterate through each letter (as char) in word
+                foreach (char letter in word.ToCharArray())
+                {
+                    //append the current morse value to transformation string (accesses morseValues
+                    //  at the ASCII value of letter MINUS 97 because the ASCII value for a is 97,
+                    //  allowing direct access to the array)
+                    transformation += morseValues[letter - 97];
+                }
+
+                //after the transformation string is made, check if it is not already in result LinkedList
+                if (!result.Contains(transformation))
+                {
+                    //if not already in result, add to it
+                    result.AddLast(transformation);
+                }
+            }
+
+            //return number of items in result LinkedList
+            return result.Count;
+        }
+
 
 
         ///#39 Combination Sum, 08/17/2022
