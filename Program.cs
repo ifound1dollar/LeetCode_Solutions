@@ -24,19 +24,130 @@ namespace LeetCode_Template
             
             //here are this problem's variables
             bool returnItem;
-            char[][] argumentItem = new char[][]
-            { 
-                new char[] { 'a', 'a', 'a', 'a' },
-                new char[] { 'a', 'b', 'b', 'a' },
-                new char[] { 'a', 'b', 'b', 'a' },
-                new char[] { 'a', 'a', 'a', 'a' },
-            };
+            int[] argumentItem = new int[] { 5, 4, 3, 2, 1, 6 };
 
             //method call
-            returnItem = ContainsCycle(argumentItem);
+            returnItem = IncreasingTriplet(argumentItem);
 
             //print value
             Console.WriteLine("RETURN ITEM: " + returnItem);
+        }
+
+
+
+        /// #334 Increasing Triplet Subsequence, 10/11/2022
+        static bool IncreasingTriplet(int[] nums)
+        {
+            //set ints for first and second item to maximum value allowed (problem does not exceed)
+            int first = int.MaxValue;
+            int second = int.MaxValue;
+
+            //iterate through every item
+            for (int i = 0; i < nums.Length; i++)
+            {
+                //if this item is less than or equal to first, set first to it (probably always set at first iteration)
+                //NOTE: any subsequent items smaller than first will decrease first
+                if (nums[i] <= first)
+                {
+                    first = nums[i];
+                }
+                //else if less than or equal to second, set second to it (will always be greater than first)
+                //NOTE: acts as the largest item until a num between first and second is found
+                else if (nums[i] <= second)
+                {
+                    second = nums[i];
+                }
+                //IF THIS ELSE IS REACHED, first is less than second (logically)
+                //  AND [this item] is greater than second (otherwise would have been caught)
+                else
+                {
+                    //because first < second < [this item], a triplet is found, so return true
+                    return true;
+                }
+            }
+
+            //if triplet not found, return false
+            return false;
+
+
+
+
+            ///WORKS, BUT TAKES FAR TOO LONG
+
+            ////start by iterating through every num except last two, because 3 elements required
+            //for (int i = 0; i < nums.Length - 2; i++)
+            //{
+            //    //iterate through all characters after i, until last one because 2 more elements required
+            //    for (int j = i + 1; j < nums.Length - 1; j++)
+            //    {
+            //        //if this element is greater than first (i), check all elements after
+            //        if (nums[i] < nums[j])
+            //        {
+            //            //iterate through all characters after j including last one
+            //            for (int k = j + 1; k < nums.Length; k++)
+            //            {
+            //                //if this element is greater than second (j), which was greater than first, triplet found
+            //                if (nums[j] < nums[k])
+            //                {
+            //                    return true;
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
+        }
+
+
+
+        /// #3 Longest Substring Without Repeating Characters, 10/11/2022
+        static int LongestSubstring(string s)
+        {
+            int longest = 0;
+            int current = 0;
+            int currentStartIndex = 0;
+
+            //for each char in string param
+            for (int i = 0; i < s.Length; i++)
+            {
+                //integer to store location of this item found in string (if any)
+                int inString = -1;
+
+                //iterate through each item in current (corresponds to substring of param string)
+                for (int j = 0; j < current; j++)
+                {
+                    //if matching char, starting at currentStartIndex and going until end of current (j)
+                    if (s[i] == s[currentStartIndex + j])
+                    {
+                        //note the last position where this item was found (so don't break)
+                        inString = j;
+                    }
+                }
+
+                //if found repeating
+                if (inString != -1)
+                {
+                    //remove everything before the repeating character by subtracting the index
+                    //NOTE: index will be 1 less than the length, but current is at a new index which should be added
+                    current -= inString;
+
+                    //move currentStartIndex up by index of inString (plus 1 because indices start at 0)
+                    currentStartIndex += inString + 1;
+                }
+                //else not already in string
+                else
+                {
+                    //increment because another valid character was found
+                    current++;
+                }
+
+                //if current is greater than longest, set longest to current
+                if (current > longest)
+                {
+                    longest = current;
+                }
+            }
+
+            return longest;
         }
 
 
