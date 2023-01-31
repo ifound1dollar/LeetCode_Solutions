@@ -23,14 +23,89 @@ namespace LeetCode_Template
             ///Main method makes a call to this problem's dedicated method, then prints the value and exits.
             
             //here are this problem's variables
-            bool returnItem;
-            int[] argumentItem = new int[] { 5, 4, 3, 2, 1, 6 };
+            int returnItem;
+            int[] argumentItem1 = new int[] { 31, 61, 83, 5, 14, 85 };
+            int[] argumentItem2 = new int[] { 1, 1, 1, 1, 1, 1 };
 
             //method call
-            returnItem = IncreasingTriplet(argumentItem);
+            returnItem = BestTeamWithoutConflicts(argumentItem1, argumentItem2);
 
             //print value
             Console.WriteLine("RETURN ITEM: " + returnItem);
+        }
+
+
+
+        //  #1626 Best Team With No Conflicts, 01/31/2023
+        static int BestTeamWithoutConflicts(int[] scores, int[] ages)
+        {
+            //sort by order of age, moving scores along with reorders
+            for (int i = 0; i < ages.Length - 1; i++)
+            {
+                int smallestIndex = i;
+                for (int j = i + 1; j < ages.Length; j++)
+                {
+                    if (ages[j] < ages[smallestIndex])
+                    {
+                        smallestIndex = j;
+                    }
+                }
+
+                int tempAge = ages[i];
+                int tempScore = scores[i];
+                ages[i] = ages[smallestIndex];
+                scores[i] = scores[smallestIndex];
+                ages[smallestIndex] = tempAge;
+                scores[smallestIndex] = tempScore;
+            }
+
+            //reorder each score within the same exact age (ex. three age 1s)
+            for (int i = 0; i < ages.Length - 1; i++)
+            {
+                int smallestIndex = i;
+                for (int j = i + 1; j < ages.Length && ages[i] == ages[j]; j++)
+                {
+                    if (scores[j] < scores[smallestIndex])
+                    {
+                        smallestIndex = j;
+                    }
+                }
+                (scores[smallestIndex], scores[i]) = (scores[i], scores[smallestIndex]);
+            }
+            //NOTE: above simply sorts ascending by age first, then score within age
+
+
+            //calculates best possible combination at this index (i) and stores in bests[]
+            int currentBest = 0;
+            int[] bests = new int[ages.Length];
+            for (int i = 0; i < ages.Length; i++)
+            {
+                //set init to score at[i], then iterate through all values smaller than at[i]
+                //  checks all values up to at[i], increasing bests[i] if a greater value is found
+                bests[i] = scores[i];
+                for (int j = 0; j < i; j++)
+                {
+                    //since is already ordered ascending, can just check if at[j] is less than at[i]
+                    if (scores[j] <= scores[i])
+                    {
+                        //it is possible that score at[i] plus best at[j] is not more than current best
+                        //THUS, only add best at[j] and score at[i] if it is greater than bests at[i]
+                        //  NOTE: can be interpreted as an inner 'best' check before the main check below
+                        if (bests[j] + scores[i] > bests[i])
+                        {
+                            bests[i] = bests[j] + scores[i];
+                        }
+                    }
+                }
+
+                //if the determined best at[i] is greater that current best, set currentBest
+                if (bests[i] > currentBest)
+                {
+                    currentBest = bests[i];
+                }
+            }
+
+            return currentBest;
         }
 
 
