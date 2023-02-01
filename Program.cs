@@ -23,15 +23,90 @@ namespace LeetCode_Template
             ///Main method makes a call to this problem's dedicated method, then prints the value and exits.
             
             //here are this problem's variables
-            int returnItem;
-            int[] argumentItem1 = new int[] { 31, 61, 83, 5, 14, 85 };
-            int[] argumentItem2 = new int[] { 1, 1, 1, 1, 1, 1 };
+            IList<IList<int>> returnItem;
+            int[] argumentItem1 = new int[] { -1, 0, 1, 2, -1, -4 };
+            //int[] argumentItem2 = new int[] { 1, 1, 1, 1, 1, 1 };
 
             //method call
-            returnItem = BestTeamWithoutConflicts(argumentItem1, argumentItem2);
+            returnItem = ThreeSum(argumentItem1);
 
             //print value
-            Console.WriteLine("RETURN ITEM: " + returnItem);
+            //Console.WriteLine("RETURN ITEM: " + returnItem);
+            foreach (IList<int> list in returnItem)
+            {
+                foreach (int num in list)
+                {
+                    Console.Write(num + ", ");
+                }
+                Console.WriteLine();
+            }
+        }
+
+
+
+        //  #15 3Sum, 02/01/2023
+        static IList<IList<int>> ThreeSum(int[] nums)
+        {
+            IList<IList<int>> triplets = new List<IList<int>>();
+            int size = nums.Length;
+            if (size < 3)
+            {
+                return triplets;
+            }
+
+            Array.Sort(nums, 0, size);
+            for (int i = 0; i < size; i++)
+            {
+                if (nums[i] > 0)
+                {
+                    //since in ascending order, if greater than 0, there cannot be a solution
+                    break;
+                }
+
+                //define search value (0 sum is goal) and two pointers for indices
+                int searchVal = -nums[i];
+                int startIndex = i + 1;
+                int endIndex = size - 1;
+
+                //will effectively move pointers together until they meet, searching for a value in O(n) time
+                while (startIndex < endIndex)
+                {
+                    if (nums[startIndex] + nums[endIndex] < searchVal)
+                    {
+                        //if sum is less than target, should move startIndex up (increases sum)
+                        startIndex++;
+                    }
+                    else if (nums[startIndex] + nums[endIndex] > searchVal)
+                    {
+                        //else if sum is greater than target, should move endIndex down (decreases sum)
+                        endIndex--;
+                    }
+                    else
+                    {
+                        //else equal so is valid triplet
+                        List<int> triplet = new() { nums[i], nums[startIndex], nums[endIndex] };
+                        triplets.Add(triplet);
+
+                        //keep moving startIndex and endIndex until different values than current
+                        while (startIndex < endIndex && nums[startIndex] == triplet[1])
+                        {
+                            startIndex++;
+                        }
+                        while (startIndex < endIndex && nums[endIndex] == triplet[2])
+                        {
+                            endIndex--;
+                        }
+                    }
+                }
+
+                //move i until its NEXT value is different (increments at top of loop)
+                while (i + 1 < size && nums[i] == nums[i + 1])
+                {
+                    i++;
+                }
+            }
+
+            return triplets;
         }
 
 
