@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace LeetCode_Template
 {
@@ -23,23 +24,64 @@ namespace LeetCode_Template
             ///Main method makes a call to this problem's dedicated method, then prints the value and exits.
             
             //here are this problem's variables
-            IList<IList<int>> returnItem;
-            int[] argumentItem1 = new int[] { -1, 0, 1, 2, -1, -4 };
-            //int[] argumentItem2 = new int[] { 1, 1, 1, 1, 1, 1 };
+            string returnItem;
+            string argumentItem = "<div>Some text probably<<div><";
 
             //method call
-            returnItem = ThreeSum(argumentItem1);
+            returnItem = CloseDivTags(argumentItem);
 
             //print value
-            //Console.WriteLine("RETURN ITEM: " + returnItem);
-            foreach (IList<int> list in returnItem)
+            Console.WriteLine("RETURN ITEM: " + returnItem);
+        }
+
+
+
+        //  Mock interview situation, close all <div> tags which are not closed
+        static string CloseDivTags(string str)
+        {
+            //EXAMPLE: "<div>Some text probably<div>", second <div> must be closed
+            bool isAwaitingSecond = false;
+            StringBuilder sb = new();
+            for (int i = 0; i < str.Length; i++)
             {
-                foreach (int num in list)
+                //add current char then check if it is valid "<div>" tag
+                sb.Append(str[i]);
+                if (str[i] == '<')
                 {
-                    Console.Write(num + ", ");
+                    if (i + 4 >= str.Length)
+                    {
+                        //if 4 more characters is outside bounds, cannot be "<div>"
+                        continue;
+                    }
+
+                    bool isValidDiv = true;
+                    string target = "div>";
+                    for (int j = 0; j < 4; j++)
+                    {
+                        if (str[i + j + 1] != target[j])
+                        {
+                            //checks next 4 characters to see if there is a mismatch from "div>"
+                            isValidDiv = false;
+                            break;
+                        }
+                    }
+                    if (!isValidDiv) { continue; }
+
+                    if (!isAwaitingSecond)
+                    {
+                        //this is first <div> tag found, so now awaiting second to close
+                        isAwaitingSecond = true;
+                    }
+                    else
+                    {
+                        //else awaiting second to close, so append '/' before continuing to rest of tag
+                        sb.Append('/');
+                        isAwaitingSecond = false;
+                    }
                 }
-                Console.WriteLine();
             }
+
+            return sb.ToString();
         }
 
 
@@ -531,6 +573,7 @@ namespace LeetCode_Template
         }
 
 
+
         ///#108 Convert Sorted Array to Binary Search Tree, 08/10/2022
         static TreeNode SortedArrayToBST(int[] nums)
         {
@@ -586,6 +629,7 @@ namespace LeetCode_Template
 
             return treeNode;
         }
+
 
 
         ///#823 Binary Trees With Factors, 08/09/2022
@@ -646,6 +690,7 @@ namespace LeetCode_Template
         }
 
 
+
         ///#704, 08/09/2022
         static int BinarySearchTargetIndex(int[] nums, int target)
         {
@@ -679,6 +724,7 @@ namespace LeetCode_Template
             //only reaches here if target is not in array, which then should return -1
             return -1;
         }
+
 
 
         ///#300, 08/08/2022
