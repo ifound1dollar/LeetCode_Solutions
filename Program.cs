@@ -17,6 +17,17 @@ namespace LeetCode_Template
             this.right = right;
         }
     }
+    public class ListNode
+    {
+        public int val;
+        public ListNode next;
+        public ListNode(int val = 0, ListNode next = null)
+        {
+            this.val = val;
+            this.next = next;
+        }
+    }
+
     class Program
     {
         static void Main()
@@ -32,6 +43,41 @@ namespace LeetCode_Template
 
             //print value
             Console.WriteLine("RETURN ITEM: " + returnItem);
+        }
+
+
+
+        //  #2 Add Two Numbers, 02/22/2023
+        static ListNode AddTwoNumbers(ListNode l1, ListNode l2)
+        {
+            int sum = 0;
+            ListNode currNode = new();
+            ListNode retNode = currNode;
+            while (l1 != null || l2 != null)
+            {
+                //sum the digit in each linked list, if applicable, else interpret 0
+                if (l1 != null)
+                {
+                    sum += l1.val;
+                    l1 = l1.next;
+                }
+                if (l2 != null)
+                {
+                    sum += l2.val;
+                    l2 = l2.next;
+                }
+
+                //make NEXT correct digit as new node, then move onto it and remove last digit of sum
+                currNode.next = new(sum % 10);
+                currNode = currNode.next;
+                sum /= 10;  //if >= 10, will carry over automatically
+            }
+            if (sum == 1)
+            {
+                //if equal to 1 after loop, add one final node with value 1 at end (carried over)
+                currNode.next = new(1);
+            }
+            return retNode.next;    //retNode is just placeholder 0, its next is actual first digit
         }
 
 
