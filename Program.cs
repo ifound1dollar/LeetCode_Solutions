@@ -47,6 +47,50 @@ namespace LeetCode_Template
 
 
 
+        //  #226 Invert Binary Tree, 08/31/2023
+        public static TreeNode InvertTree(TreeNode root)
+        {
+            //if root is null, return immediately
+            if (root == null)
+            {
+                return root;
+            }
+
+            //use queue List (with root by default) and temp object for current node
+            List<TreeNode> queue = new()
+            {
+                root
+            };
+            TreeNode currNode;
+
+            do
+            {
+                //set currNode to first item in queue
+                currNode = queue[0];
+
+                //swap left and right nodes
+                (currNode.left, currNode.right) = (currNode.right, currNode.left);
+
+                //add both nodes to the queue IF NOT NULL
+                if (currNode.left != null)
+                {
+                    queue.Add(currNode.left);
+                }
+                if (currNode.right != null)
+                {
+                    queue.Add(currNode.right);
+                }
+
+                //remove this queue item before next iteration
+                queue.RemoveAt(0);
+            } while (queue.Count > 0);
+
+            //entire tree now inverted, so return root node
+            return root;
+        }
+
+
+
         //  #2 Add Two Numbers, 02/22/2023
         static ListNode AddTwoNumbers(ListNode l1, ListNode l2)
         {
